@@ -19,6 +19,43 @@ from handlers.config_handler import ConfigHandler
 # Get configuration
 config = ConfigHandler.get_config()
 
+#class ScreenshotHandler
+class ScreenshotHandler:
+    """
+    Handles screenshot capture operations for test documentation and debugging.
+    """
+
+    def __init__(self, logger):
+        """Initialize with a logger instance"""
+        self.logger = logger
+        self.screenshot_dir = os.path.join(os.path.dirname(__file__), 'screenshots')
+        # Create separate directories for success and failure screenshots
+        self.success_dir = os.path.join(self.screenshot_dir, 'success')
+        self.failure_dir = os.path.join(self.screenshot_dir, 'failure')
+        os.makedirs(self.success_dir, exist_ok=True)
+        os.makedirs(self.failure_dir, exist_ok=True)
+
+    def take_screenshot(self, driver, status, additional_info=""):
+        try:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"{status}_{additional_info}_{timestamp}.png"
+
+            # Choose directory based on status
+            screenshot_dir = self.success_dir if status == "success" else self.failure_dir
+            screenshot_path = os.path.join(screenshot_dir, filename)
+
+            # Simple screenshot without scrolling
+            driver.save_screenshot(screenshot_path)
+
+            self.logger.info(f"Screenshot saved to {screenshot_path}")
+            return screenshot_path
+
+        except Exception as e:
+            self.logger.error(f"Failed to capture screenshot: {str(e)}")
+            self.logger.debug(f"Screenshot failure details:", exc_info=True)
+            return None
+
+
 class LogoutTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
