@@ -19,6 +19,9 @@ from handlers.config_handler import ConfigHandler
 # Get configuration
 config = ConfigHandler.get_config()
 
+
+
+
 #class ScreenshotHandler
 class ScreenshotHandler:
     """
