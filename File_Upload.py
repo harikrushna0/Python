@@ -52,7 +52,7 @@ VALID_FACTORS = ["Power Analysis"]  # List of valid analysis factors
 SHORT_TIMEOUT = 10
 LONG_TIMEOUT = 30
 
-
+#class ScreenshotHandler
 class ScreenshotHandler:
     """
     Handles screenshot capture operations for test documentation and debugging.
