@@ -147,7 +147,30 @@ class FileHandler:
             logger.error(f"Error reading or parsing HTML file: {e}")
             return None
 
+def test_browser_compatibility(self):
+    browsers = ['chrome', 'firefox', 'edge']
+    for browser in browsers:
+        self.logger.info(f"Testing browser: {browser}")
+        try:
+            driver = WebDriverSetup.get_driver(browser=browser)
+            wait = WebDriverWait(driver, 20)
+            driver.get("https://your-site-url.com")
 
+            # Validate page title or a known element
+            title = driver.title
+            self.logger.info(f"{browser} - Page title is: {title}")
+            assert "Expected Title" in title
+
+            # Screenshot for visual confirmation
+            screenshot_path = f"screenshots/compatibility/{browser}_landing.png"
+            os.makedirs(os.path.dirname(screenshot_path), exist_ok=True)
+            driver.save_screenshot(screenshot_path)
+            self.logger.info(f"Screenshot saved: {screenshot_path}")
+        except Exception as e:
+            self.logger.error(f"Error testing {browser}: {e}")
+            assert False
+        finally:
+            driver.quit()
 class FileUploadTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -257,23 +280,34 @@ class FileUploadTests(unittest.TestCase):
             self.screenshot_handler.take_screenshot(self.driver, "failure", "factor_selection_error")
             return False
 
-    def handle_file_upload(self, file_path):
-        try:
-            self.logger.info("Searching for file input element...")
-            file_input = WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.XPATH, "//input[@type='file']"))
-            )
-            self.logger.info("File input element found successfully")
-            time.sleep(7)
-            self.logger.info(f"Attempting to upload file: {file_path}")
-            file_input.send_keys(file_path)
-            self.logger.info(f"File upload successful: {file_path}")
-            self.screenshot_handler.take_screenshot(self.driver, "success", "file_upload")
-            return True
-        except Exception as e:
-            self.logger.error(f"File upload failed: {e}")
-            self.screenshot_handler.take_screenshot(self.driver, "failure", "file_upload_error")
-            return False
+def handle_file_upload(self, file_path):
+    try:
+        self.logger.info("Initiating drag-and-drop file upload")
+        drop_zone = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//div[contains(@class, 'drop-zone')]"))
+        )
+
+        self.driver.execute_script("""
+        const dropZone = arguments[0];
+        const dataTransfer = new DataTransfer();
+        const file = new File([""], arguments[1], { type: 'text/html' });
+        dataTransfer.items.add(file);
+        const event = new DragEvent('drop', {
+            dataTransfer: dataTransfer,
+            bubbles: true,
+            cancelable: true
+        });
+        dropZone.dispatchEvent(event);
+        """, drop_zone, os.path.basename(file_path))
+
+        time.sleep(3)
+        self.logger.info("Drag-and-drop upload simulated successfully")
+        return True
+
+    except Exception as e:
+        self.logger.error(f"Drag-and-drop file upload failed: {e}")
+        return False
+
 
     def extract_severity_counts(self, html_content, table_class, severity_column_index=1):
         """
@@ -1381,7 +1415,8 @@ class FileUploadTests(unittest.TestCase):
         except Exception as e:
             self.logger.error(f"Error reading downloaded file: {e}")
 
-   
+
+
         
     def test_signup_and_login(self):
         self.logger.info("Starting signup and login test")
