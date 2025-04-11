@@ -52,7 +52,47 @@ class LogoutTests(unittest.TestCase):
             cls.screenshot_handler.take_screenshot(cls.driver, "failure", "setup_failed")
             raise
 
-    
+    def test_logout_scenarios(self):
+        """Test both normal logout flow and session expiration scenarios"""
+        self.logger.info("Starting comprehensive logout test")
+        
+        try:
+            # Part 1: Test normal logout flow
+            self.logger.info("Testing normal logout flow")
+            time.sleep(5)  # Wait for page to fully load
+            
+            # Perform normal logout
+            self.sign_in_handler.logout()
+            time.sleep(5)  # Increased wait time after logout to ensure completion
+            
+
+
+            # Login again for session expiration test
+            self.logger.info("Logging in again for session expiration test")
+            time.sleep(3)  # Added wait time before next login attempt
+            if self.sign_in_handler.handle_login():
+                self.logger.info("Successfully logged in for session expiration test")
+                time.sleep(3)  # Increased wait time after successful login
+            else:
+                raise Exception("Failed to login for session expiration test")
+
+            # Part 2: Test session expiration
+            self.logger.info("Testing session expiration")
+            
+            # Clear cookies to simulate session expiration
+            self.driver.delete_all_cookies()
+            time.sleep(3)  # Increased wait time after clearing cookies
+            
+            # Check cookie is deleted
+            if self.driver.get_cookie('session') is None:
+                self.logger.info("Session cookie deleted successfully")
+            else:
+                raise Exception("Session cookie not deleted")
+
+        except Exception as e:
+            self.logger.error(f"Error during logout test: {e}")
+            self.screenshot_handler.take_screenshot(self.driver, "failure", f"logout_test_failed")
+            raise
 
     @classmethod
     def tearDownClass(cls):
