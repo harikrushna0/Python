@@ -50,6 +50,21 @@ def test_logout_flow(self):
         self.logger.error(f"Error during logout test: {str(e)}")
         self.screenshot_handler.take_screenshot(self.driver, "failure", "logout_test_exception")
 
+
+def retry_on_failure(max_attempts=3, delay=5):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            for attempt in range(max_attempts):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    args[0].logger.warning(f"Attempt {attempt + 1} failed: {str(e)}")
+                    time.sleep(delay)
+            args[0].logger.error(f"All {max_attempts} attempts failed for {func.__name__}")
+            return False
+        return wrapper
+    return decorator
+
 class AutomationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
