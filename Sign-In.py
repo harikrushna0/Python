@@ -106,6 +106,10 @@ class AutomationTests(unittest.TestCase):
             self.driver.maximize_window()
             self.logger.info("Navigated to login page")
 
+              time.sleep(1000)
+
+
+
             # Loading check with logging
             self.logger.info("Waiting for initial page load...")
             loading_xpath = "//p[contains(text(), 'Please wait while we load the content for you.')]"
