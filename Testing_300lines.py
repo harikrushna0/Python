@@ -51,19 +51,57 @@ def test_logout_flow(self):
         self.screenshot_handler.take_screenshot(self.driver, "failure", "logout_test_exception")
 
 
-def retry_on_failure(max_attempts=3, delay=5):
+def retry_on_failure(
+    max_attempts=3,
+    delay=5,
+    backoff_factor=2,
+    exceptions=(Exception,),
+    log_level="warning",
+    raise_on_failure=False,
+    custom_message=None
+):
+    """
+    Decorator to retry a function on failure.
+
+    Parameters:
+    - max_attempts (int): Max number of retries.
+    - delay (int): Initial delay between attempts.
+    - backoff_factor (int): Multiplies delay each retry (exponential backoff).
+    - exceptions (tuple): Exceptions to catch and retry on.
+    - log_level (str): 'info', 'warning', or 'error'.
+    - raise_on_failure (bool): Raise last exception if all retries fail.
+    - custom_message (str): Custom log message prefix on failures.
+    """
     def decorator(func):
         def wrapper(*args, **kwargs):
-            for attempt in range(max_attempts):
+            current_delay = delay
+            for attempt in range(1, max_attempts + 1):
                 try:
                     return func(*args, **kwargs)
-                except Exception as e:
-                    args[0].logger.warning(f"Attempt {attempt + 1} failed: {str(e)}")
-                    time.sleep(delay)
-            args[0].logger.error(f"All {max_attempts} attempts failed for {func.__name__}")
+                except exceptions as e:
+                    logger = getattr(args[0], 'logger', None)
+                    msg = f"{custom_message or 'Retry'} - Attempt {attempt}/{max_attempts} failed: {str(e)}"
+                    if logger:
+                        getattr(logger, log_level, logger.warning)(msg)
+                    else:
+                        print(msg)
+
+                    if attempt < max_attempts:
+                        time.sleep(current_delay)
+                        current_delay *= backoff_factor
+            # All attempts failed
+            final_msg = f"All {max_attempts} attempts failed for `{func.__name__}`"
+            if logger:
+                logger.error(final_msg)
+            else:
+                print(final_msg)
+            if raise_on_failure:
+                raise
             return False
         return wrapper
     return decorator
+
+
 
 class AutomationTests(unittest.TestCase):
     @classmethod
