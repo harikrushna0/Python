@@ -99,6 +99,8 @@ class AutomationTests(unittest.TestCase):
     def test_signin(self):
         self.logger.info("Starting test: test_signin")
         try:
+
+            time.sleep(1000)
             # Navigate to login page (only once)
             self.driver.get(config.LOGIN_URL)
             self.driver.maximize_window()
