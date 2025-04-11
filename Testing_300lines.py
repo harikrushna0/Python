@@ -17,6 +17,53 @@ from handlers.config_handler import ConfigHandler
 
 # Get configuration
 config = ConfigHandler.get_config()
+def test_logout_flow(self):
+    self.logger.info("Starting test: test_logout_flow")
+    try:
+        # Ensure user is logged in
+        self.driver.get(config.LOGIN_URL)
+        login_result = self.sign_in_handler.handle_login(reopen_page=False)
+        if not login_result:
+            self.logger.error("Login failed during logout test")
+            self.screenshot_handler.take_screenshot(self.driver, "failure", "logout_test_login_failed")
+            return
+
+        # Wait for logout button to be visible
+        logout_button_xpath = "//button[contains(text(), 'Logout')]"
+        logout_button = self.wait.until(EC.element_to_be_clickable((By.XPATH, logout_button_xpath)))
+        logout_button.click()
+        self.logger.info("Clicked on logout button")
+
+        # Validate redirected back to login
+        login_page_element = self.wait.until(
+            EC.presence_of_element_located((By.XPATH, "//h1[contains(text(), 'Welcome back')]"))
+        )
+
+        if login_page_element.is_displayed():
+            self.logger.info("Logout successful, redirected to login page")
+            self.screenshot_handler.take_screenshot(self.driver, "success", "logout_successful")
+        else:
+            self.logger.error("Logout failed, login page not detected")
+            self.screenshot_handler.take_screenshot(self.driver, "failure", "logout_page_not_found")
+
+    except Exception as e:
+        self.logger.error(f"Error during logout test: {str(e)}")
+        self.screenshot_handler.take_screenshot(self.driver, "failure", "logout_test_exception")
+
+
+def retry_on_failure(max_attempts=3, delay=5):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            for attempt in range(max_attempts):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    args[0].logger.warning(f"Attempt {attempt + 1} failed: {str(e)}")
+                    time.sleep(delay)
+            args[0].logger.error(f"All {max_attempts} attempts failed for {func.__name__}")
+            return False
+        return wrapper
+    return decorator
 
 class AutomationTests(unittest.TestCase):
     @classmethod
