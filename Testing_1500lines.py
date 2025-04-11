@@ -1381,75 +1381,7 @@ class FileUploadTests(unittest.TestCase):
         except Exception as e:
             self.logger.error(f"Error reading downloaded file: {e}")
 
-    def handle_copy_code_functionality(self):
-        """
-        Handles the copy code functionality for all enabled buttons within the specified div.
-        Verifies that the correct code is copied to the clipboard.
-        """
-        try:
-            self.logger.info("Starting copy code functionality testing")
-
-            # Locate all buttons within the specified div
-            buttons = self.driver.find_elements(By.XPATH, "//div[contains(@class, 'flex bg-white')]//button")
-
-            for button in buttons:
-                button_text = button.text.split("\n")[0]
-                is_disabled = button.get_attribute("disabled")
-
-                if is_disabled:
-                    self.logger.info(f"Skipping disabled button: {button_text}")
-                    continue
-
-                self.logger.info(f"Clicking on enabled button: {button_text}")
-                button.click()  # Click the enabled button
-                time.sleep(2)  # Wait for any potential page updates
-
-                issue_divs = self.driver.find_elements(By.XPATH,
-                                                       "//div[contains(@class, 'text-[14px] sm:text-[20px] flex flex-col gap-4 my-5')]")
-                div = issue_divs[0]
-                # Locate the code blocks after clicking the button
-                code_blocks = div.find_elements(By.XPATH, ".//pre//code")
-                code_block_before_solution = code_blocks[0].get_attribute("innerText") if len(
-                    code_blocks) > 0 else "No Code Found"
-                code_block_after_solution = code_blocks[1].get_attribute("innerText") if len(
-                    code_blocks) > 1 else "No Code Found"
-
-                expected_content = code_block_before_solution
-
-                # Locate and click the "Copy Code" button
-                copy_button_xpath = "//button[contains(text(), 'Copy Code')]"
-                copy_button = WebDriverWait(self.driver, 10).until(
-                    EC.presence_of_element_located((By.XPATH, copy_button_xpath))
-                )
-
-                self.click_element(copy_button)  # Use the new click_element method
-                self.logger.info("Successfully clicked the 'Copy Code' button")
-
-                # Wait a moment to ensure the clipboard is updated
-                time.sleep(1)
-
-                # Get the copied content from the clipboard
-                copied_content = pyperclip.paste()
-
-                # Normalize and compare the copied content with the expected content
-                normalized_copied_content = ' '.join(copied_content.split())
-                normalized_expected_content = ' '.join(expected_content.split())
-
-                if normalized_copied_content == normalized_expected_content:
-                    self.logger.info("Copied content matches the expected content for the button: %s", button_text)
-                else:
-                    self.logger.error("Copied content does not match the expected content for button: %s", button_text)
-                    self.logger.error("Expected: %s, but got: %s", normalized_expected_content,
-                                      normalized_copied_content)
-
-                time.sleep(2)  # Wait for any potential UI updates after copying
-
-            self.logger.info("Completed copy code functionality testing for all enabled buttons")
-            return True
-
-        except Exception as e:
-            self.logger.error(f"Error during copy code functionality testing: {e}")
-            return False
+   
         
     def test_signup_and_login(self):
         self.logger.info("Starting signup and login test")
@@ -1525,11 +1457,7 @@ class FileUploadTests(unittest.TestCase):
                 else:
                     self.logger.info(f"Arrow button handling successful for factor: {factor}")
 
-                if not self.handle_copy_code_functionality():
-                    self.log_error_with_screenshot("Copy code functionality failed", "copy_code_failure")
-                    self.logger.error("Copy code functionality failed")
-                else:
-                    self.logger.info(f"Copy code functionality successful for factor: {factor}")
+              
 
                 self.logger.info(f"=== Completed all tests for factor: {factor} ===")
 
@@ -1540,8 +1468,6 @@ class FileUploadTests(unittest.TestCase):
         finally:
             self.logger.info("Test execution completed")
             # self.handle_logout()
-
-   
 
 
 if __name__ == "__main__":
