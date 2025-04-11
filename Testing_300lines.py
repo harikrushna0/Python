@@ -101,6 +101,39 @@ def retry_on_failure(
         return wrapper
     return decorator
 
+def test_security_privacy_link_navigation(self):
+    self.logger.info("Starting test: test_security_privacy_link_navigation")
+    try:
+        self.driver.get(config.LOGIN_URL)
+        link_xpath = "//span[contains(@class, 'underline') and contains(text(), 'Security') and contains(text(), 'Privacy')]"
+        link = self.wait.until(EC.element_to_be_clickable((By.XPATH, link_xpath)))
+        main_window = self.driver.current_window_handle
+
+        link.click()
+        time.sleep(3)
+
+        # Switch to the new window/tab
+        all_windows = self.driver.window_handles
+        for handle in all_windows:
+            if handle != main_window:
+                self.driver.switch_to.window(handle)
+                break
+
+        # Verify title or URL of new page
+        expected_url_part = "privacy"
+        if expected_url_part in self.driver.current_url:
+            self.logger.info("Security & Privacy link opened correctly in new tab")
+            self.screenshot_handler.take_screenshot(self.driver, "success", "privacy_link_navigation_success")
+        else:
+            self.logger.error("Incorrect URL opened from Security & Privacy link")
+            self.screenshot_handler.take_screenshot(self.driver, "failure", "privacy_link_wrong_url")
+
+        self.driver.close()
+        self.driver.switch_to.window(main_window)
+
+    except Exception as e:
+        self.logger.error(f"Exception in test_security_privacy_link_navigation: {str(e)}")
+        self.screenshot_handler.take_screenshot(self.driver, "failure", "privacy_link_exception")
 
 
 class AutomationTests(unittest.TestCase):
