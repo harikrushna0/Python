@@ -147,7 +147,30 @@ class FileHandler:
             logger.error(f"Error reading or parsing HTML file: {e}")
             return None
 
+def test_browser_compatibility(self):
+    browsers = ['chrome', 'firefox', 'edge']
+    for browser in browsers:
+        self.logger.info(f"Testing browser: {browser}")
+        try:
+            driver = WebDriverSetup.get_driver(browser=browser)
+            wait = WebDriverWait(driver, 20)
+            driver.get("https://your-site-url.com")
 
+            # Validate page title or a known element
+            title = driver.title
+            self.logger.info(f"{browser} - Page title is: {title}")
+            assert "Expected Title" in title
+
+            # Screenshot for visual confirmation
+            screenshot_path = f"screenshots/compatibility/{browser}_landing.png"
+            os.makedirs(os.path.dirname(screenshot_path), exist_ok=True)
+            driver.save_screenshot(screenshot_path)
+            self.logger.info(f"Screenshot saved: {screenshot_path}")
+        except Exception as e:
+            self.logger.error(f"Error testing {browser}: {e}")
+            assert False
+        finally:
+            driver.quit()
 class FileUploadTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -1381,7 +1404,8 @@ class FileUploadTests(unittest.TestCase):
         except Exception as e:
             self.logger.error(f"Error reading downloaded file: {e}")
 
-   
+
+
         
     def test_signup_and_login(self):
         self.logger.info("Starting signup and login test")
