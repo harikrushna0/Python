@@ -280,23 +280,34 @@ class FileUploadTests(unittest.TestCase):
             self.screenshot_handler.take_screenshot(self.driver, "failure", "factor_selection_error")
             return False
 
-    def handle_file_upload(self, file_path):
-        try:
-            self.logger.info("Searching for file input element...")
-            file_input = WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.XPATH, "//input[@type='file']"))
-            )
-            self.logger.info("File input element found successfully")
-            time.sleep(7)
-            self.logger.info(f"Attempting to upload file: {file_path}")
-            file_input.send_keys(file_path)
-            self.logger.info(f"File upload successful: {file_path}")
-            self.screenshot_handler.take_screenshot(self.driver, "success", "file_upload")
-            return True
-        except Exception as e:
-            self.logger.error(f"File upload failed: {e}")
-            self.screenshot_handler.take_screenshot(self.driver, "failure", "file_upload_error")
-            return False
+def handle_file_upload(self, file_path):
+    try:
+        self.logger.info("Initiating drag-and-drop file upload")
+        drop_zone = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//div[contains(@class, 'drop-zone')]"))
+        )
+
+        self.driver.execute_script("""
+        const dropZone = arguments[0];
+        const dataTransfer = new DataTransfer();
+        const file = new File([""], arguments[1], { type: 'text/html' });
+        dataTransfer.items.add(file);
+        const event = new DragEvent('drop', {
+            dataTransfer: dataTransfer,
+            bubbles: true,
+            cancelable: true
+        });
+        dropZone.dispatchEvent(event);
+        """, drop_zone, os.path.basename(file_path))
+
+        time.sleep(3)
+        self.logger.info("Drag-and-drop upload simulated successfully")
+        return True
+
+    except Exception as e:
+        self.logger.error(f"Drag-and-drop file upload failed: {e}")
+        return False
+
 
     def extract_severity_counts(self, html_content, table_class, severity_column_index=1):
         """
