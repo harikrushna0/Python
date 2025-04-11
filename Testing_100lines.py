@@ -85,9 +85,7 @@ class LogoutTests(unittest.TestCase):
             # Part 2: Test session expiration
             self.logger.info("Testing session expiration")
             
-            # Clear cookies to simulate session expiration
-            self.driver.delete_all_cookies()
-            time.sleep(3)  # Increased wait time after clearing cookies
+           
             
             # Check cookie is deleted
             if self.driver.get_cookie('session') is None:
