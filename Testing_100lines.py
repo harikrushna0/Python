@@ -52,11 +52,17 @@ class LogoutTests(unittest.TestCase):
             cls.screenshot_handler.take_screenshot(cls.driver, "failure", "setup_failed")
             raise
 
+
+        
+
     def test_logout_scenarios(self):
         """Test both normal logout flow and session expiration scenarios"""
         self.logger.info("Starting comprehensive logout test")
         
         try:
+
+            time.sleep(5) 
+            # added before logout to allow page to fully load
             # Part 1: Test normal logout flow
             self.logger.info("Testing normal logout flow")
             time.sleep(5)  # Wait for page to fully load
