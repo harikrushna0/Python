@@ -60,6 +60,8 @@ class ScreenshotHandler:
 
 #class automationtests
 class AutomationTests(unittest.TestCase):
+
+    print("Running AutomationTests...")
     @classmethod
     def setUpClass(cls):
         cls.logger = Logger.setup_logger()
@@ -338,5 +340,7 @@ class AutomationTests(unittest.TestCase):
             cls.logger.info("Test execution completed")
 
 
+
 if __name__ == "__main__":
+    print(" Running tests...")
     unittest.main()
