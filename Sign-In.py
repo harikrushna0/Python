@@ -58,7 +58,7 @@ class ScreenshotHandler:
 
 
 
-
+#class automationtests
 class AutomationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
