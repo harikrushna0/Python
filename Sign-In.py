@@ -340,6 +340,7 @@ class AutomationTests(unittest.TestCase):
             cls.logger.info("Test execution completed")
 
 
+
 if __name__ == "__main__":
     print(" Running tests...")
     unittest.main()
