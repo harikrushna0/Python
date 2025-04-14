@@ -87,7 +87,7 @@ class AutomationTests(unittest.TestCase):
             if hasattr(cls, 'screenshot_handler'):
                 cls.screenshot_handler.take_screenshot(cls.driver, "failure", "setup_failed")
             raise
-
+    #setup class
     def setUp(self):
         # Take screenshot before each test
         self.screenshot_handler.take_screenshot(self.driver, "success", f"before_{self._testMethodName}")
@@ -106,7 +106,7 @@ class AutomationTests(unittest.TestCase):
             self.driver.maximize_window()
             self.logger.info("Navigated to login page")
 
-              time.sleep(1000)
+            time.sleep(1000)
 
 
 
