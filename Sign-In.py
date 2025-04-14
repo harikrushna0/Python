@@ -36,26 +36,7 @@ class ScreenshotHandler:
         os.makedirs(self.success_dir, exist_ok=True)
         os.makedirs(self.failure_dir, exist_ok=True)
 
-    def take_screenshot(self, driver, status, additional_info=""):
-        try:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"{status}_{additional_info}_{timestamp}.png"
-
-            # Choose directory based on status
-            screenshot_dir = self.success_dir if status == "success" else self.failure_dir
-            screenshot_path = os.path.join(screenshot_dir, filename)
-
-            # Simple screenshot without scrolling
-            driver.save_screenshot(screenshot_path)
-
-            self.logger.info(f"Screenshot saved to {screenshot_path}")
-            return screenshot_path
-
-        except Exception as e:
-            self.logger.error(f"Failed to capture screenshot: {str(e)}")
-            self.logger.debug(f"Screenshot failure details:", exc_info=True)
-            return None
-
+   
 
 
 #class automationtests
