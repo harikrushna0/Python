@@ -1,20 +1,3 @@
-import os
-import time
-import imaplib
-from email import message_from_bytes
-from email.header import decode_header
-from datetime import datetime
-import logging
-import unittest
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
-from sign_in_handler import SignInHandler
-from webdriver_setup import WebDriverSetup
-from logger import Logger
-from screenshot_handler import ScreenshotHandler
-from handlers.config_handler import ConfigHandler
 
 # Get configuration
 config = ConfigHandler.get_config()
